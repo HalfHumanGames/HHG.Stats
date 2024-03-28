@@ -1,0 +1,24 @@
+{
+  "name": "com.halfhumangames.statsystem",
+  "version": "1.0.0",
+  "displayName": "HHG - Stat System",
+  "description": "Stat system for Unity",
+  "unity": "2020.3",
+  "unityRelease": "6f1",
+  "documentationUrl": "https://github.com/HalfHumanGames/HHG.StatSystem/blob/main/README.md",
+  "changelogUrl": "https://github.com/HalfHumanGames/HHG.StatSystem/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/HalfHumanGames/HHG.StatSystem/blob/main/LICENSE",
+  "keywords": [
+    "Stat",
+    "Element"
+  ],
+  "author": {
+    "name": "Half Human Games",
+    "email": "contact@halfhumangames.com",
+    "url": "https://github.com/HalfHumanGames"
+  },
+  "dependencies": {
+    "com.halfhumangames.common": "1.0.0"
+    "com.alexeytaranov.serializereferencedropdown": "0.4.0"
+  }
+}
