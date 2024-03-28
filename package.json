@@ -18,7 +18,7 @@
     "url": "https://github.com/HalfHumanGames"
   },
   "dependencies": {
-    "com.halfhumangames.common": "1.0.0"
+    "com.halfhumangames.common": "1.0.0",
     "com.alexeytaranov.serializereferencedropdown": "0.4.0"
   }
 }
