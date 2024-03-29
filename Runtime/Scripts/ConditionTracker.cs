@@ -16,7 +16,7 @@ namespace HHG.StatSystem.Runtime
 
         private void Awake()
         {
-            stats = GetComponent<IStats>();
+            stats = GetComponentInChildren<IStats>();
 
             if (stats == null)
             {
