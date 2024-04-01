@@ -17,11 +17,6 @@ namespace HHG.StatSystem.Runtime
         private void Awake()
         {
             stats = GetComponentInChildren<IStats>();
-
-            if (stats == null)
-            {
-                Destroy(this);
-            }
         }
 
         public void Apply(params ConditionAsset[] conditions)
@@ -48,8 +43,11 @@ namespace HHG.StatSystem.Runtime
                     current[tag] = conditions[i];
                     behaviours[tag] = gameObject.AddMetaBehaviours(conditions[i].Behaviours);
                     timers[tag] = conditions[i].Duration;
-                    conditions[i].Apply(stats);
-                    
+
+                    if (stats != null)
+                    {
+                        conditions[i].Apply(stats);
+                    }
                 }
             }
         }
@@ -87,7 +85,11 @@ namespace HHG.StatSystem.Runtime
                     behaviours[tag].Destroy();
                     behaviours.Remove(tag);
                     timers.Remove(tag);
-                    conditions[i].Remove(stats);
+
+                    if (stats != null)
+                    {
+                        conditions[i].Remove(stats);
+                    }
                 }
             }
         }
