@@ -13,7 +13,7 @@ namespace HHG.StatSystem.Runtime
             {
                 if (string.IsNullOrEmpty(tag))
                 {
-                    tag = Regex.Replace(name, @"[\(\[\{].*?[\)\]\}]|\s+|[^a-zA-Z0-9\s]", "");
+                    tag = Regex.Replace(name, @"[\(\[\{].*?[\)\]\}]|\s+|[^a-zA-Z\s]", "");
                 }
                 return tag;
             }
