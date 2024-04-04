@@ -9,10 +9,9 @@ namespace HHG.StatSystem.Runtime
         private const float infinite = -1;
 
         private IStats stats;
-        private List<string> tags = new List<string>();
-        private Dictionary<string, ConditionAsset> current = new Dictionary<string, ConditionAsset>();
-        private Dictionary<string, MetaBehaviour[]> behaviours = new Dictionary<string, MetaBehaviour[]>();
-        private Dictionary<string, float> timers = new Dictionary<string, float>();
+        private List<ConditionAsset> current = new List<ConditionAsset>();
+        private List<MetaBehaviour[]> behaviours = new List<MetaBehaviour[]>();
+        private List<float> timers = new List<float>();
 
         private void Awake()
         {
@@ -23,80 +22,59 @@ namespace HHG.StatSystem.Runtime
         {
             for (int i = 0; i < conditions.Length; i++)
             {
-                string tag = conditions[i].Tag;
+                current.Add(conditions[i]);
+                behaviours.Add(gameObject.AddMetaBehaviours(conditions[i].Behaviours));
+                timers.Add(conditions[i].Duration);
 
-                if (HasCondition(conditions[i]))
+                if (stats != null)
                 {
-                    if (conditions[i].Priority > current[tag].Priority)
-                    {
-                        Remove(current[tag]);
-                        Apply(conditions[i]);
-                    }
-                    else if (conditions[i].Priority == current[tag].Priority)
-                    {
-                        timers[tag] = conditions[i].Duration;
-                    }
-                }
-                else
-                {
-                    tags.Add(tag);
-                    current[tag] = conditions[i];
-                    behaviours[tag] = gameObject.AddMetaBehaviours(conditions[i].Behaviours);
-                    timers[tag] = conditions[i].Duration;
-
-                    if (stats != null)
-                    {
-                        conditions[i].Apply(stats);
-                    }
+                    conditions[i].Apply(stats);
                 }
             }
         }
 
         private void Update()
         {
-            for (int i = 0; i < tags.Count; i++)
+            for (int i = 0; i < timers.Count; i++)
             {
-                string tag = tags[i];
-
-                if (timers[tag] == infinite)
+                if (timers[i] == infinite)
                 {
                     continue;
                 }
 
-                timers[tag] -= Time.deltaTime;
+                timers[i] -= Time.deltaTime;
 
-                if (timers[tag] <= 0)
+                if (timers[i] <= 0)
                 {
-                    Remove(current[tag]);
+                    RemoveAt(i);
                     i--;
                 }
             }
         }
 
-        public void Remove(params ConditionAsset[] conditions)
-        {
-            for (int i = 0; i < conditions.Length; i++)
-            {
-                if (HasCondition(conditions[i]))
-                {
-                    string tag = conditions[i].Tag;
-                    tags.Remove(tag);
-                    current.Remove(tag);
-                    behaviours[tag].Destroy();
-                    behaviours.Remove(tag);
-                    timers.Remove(tag);
 
-                    if (stats != null)
-                    {
-                        conditions[i].Remove(stats);
-                    }
-                }
+        public void Remove(ConditionAsset condition)
+        {
+            int index = current.IndexOf(condition);
+
+            if (index >= 0)
+            {
+                RemoveAt(index);
             }
         }
 
-        public bool HasCondition(ConditionAsset condition)
+        public void RemoveAt(int index)
         {
-            return current.ContainsKey(condition.Tag);
+            ConditionAsset condition = current[index];
+            current.RemoveAt(index);
+            behaviours[index].Destroy();
+            behaviours.RemoveAt(index);
+            timers.RemoveAt(index);
+
+            if (stats != null)
+            {
+                condition.Remove(stats);
+            }
         }
     }
 }
