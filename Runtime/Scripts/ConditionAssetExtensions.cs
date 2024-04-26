@@ -24,7 +24,7 @@ namespace HHG.StatSystem.Runtime
 
         public static void AggregateTo(this IEnumerable<ConditionAsset> source, List<ConditionAsset> aggregated)
         {
-            foreach (ConditionAsset item in aggregated)
+            foreach (ConditionAsset item in aggregated.Distinct())
             {
                 Object.Destroy(item);
             }
