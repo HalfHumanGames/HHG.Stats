@@ -1,3 +1,4 @@
+using HHG.Common.Runtime;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -24,10 +25,7 @@ namespace HHG.StatSystem.Runtime
 
         public static void AggregateTo(this IEnumerable<ConditionAsset> source, List<ConditionAsset> aggregated)
         {
-            foreach (ConditionAsset item in aggregated.Distinct())
-            {
-                Object.Destroy(item);
-            }
+            ObjectUtil.Destroy(aggregated);
 
             aggregated.Clear();
 

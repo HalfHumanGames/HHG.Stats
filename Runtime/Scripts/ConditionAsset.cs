@@ -82,5 +82,16 @@ namespace HHG.StatSystem.Runtime
 
         internal void Apply(IStats stats) => mods.Apply(stats);
         internal void Remove(IStats stats) => mods.Remove(stats);
+
+        public void OnDestroy()
+        {
+            foreach(MetaBehaviour behaviour in behaviours)
+            {
+                if (behaviour is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            }
+        }
     }
 }
