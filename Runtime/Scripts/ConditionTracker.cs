@@ -1,5 +1,6 @@
 using HHG.Common.Runtime;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace HHG.StatSystem.Runtime
@@ -22,6 +23,11 @@ namespace HHG.StatSystem.Runtime
         {
             for (int i = 0; i < conditions.Length; i++)
             {
+                if (current.Any(c => c.Tag == conditions[i].Tag))
+                {
+                    continue;
+                }
+
                 current.Add(conditions[i]);
                 behaviours.Add(gameObject.AddMetaBehaviours(conditions[i].Behaviours));
                 timers.Add(conditions[i].Duration);
