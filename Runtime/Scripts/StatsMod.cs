@@ -1,3 +1,4 @@
+using HHG.Common.Runtime;
 using System;
 using UnityEngine;
 
@@ -6,7 +7,7 @@ namespace HHG.StatSystem.Runtime
     [Serializable]
     public class StatsMod : StatMod
     {
-        [SerializeField] private StatAsset stat;
+        [SerializeField, Dropdown] private StatAsset stat;
 
         public StatsMod(StatAsset name, float value) : base(value) => stat = name;
         public StatsMod(StatAsset name, float value, StatModType type) : base(value, type) => stat = name;
