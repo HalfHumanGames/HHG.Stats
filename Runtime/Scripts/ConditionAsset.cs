@@ -2,7 +2,6 @@ using HHG.Common.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace HHG.StatSystem.Runtime
@@ -16,7 +15,7 @@ namespace HHG.StatSystem.Runtime
             {
                 if (string.IsNullOrEmpty(tag))
                 {
-                    tag = Regex.Replace(name, @"[\(\[\{].*?[\)\]\}]|\s+|[^a-zA-Z\s]", "");
+                    tag = TagUtil.GetTag(name);
                 }
                 return tag;
             }
@@ -29,8 +28,16 @@ namespace HHG.StatSystem.Runtime
         [SerializeField] private float priority;
         [SerializeField] private float duration;
         [SerializeField] private List<StatsMod> mods = new List<StatsMod>();
-
         [SerializeReference, SerializeReferenceDropdown] private List<MetaBehaviour> behaviours = new List<MetaBehaviour>();
+        [SerializeField] private AggregateFlags aggregateFlags;
+
+        [Flags]
+        private enum AggregateFlags
+        {
+            Duration = 1 << 0,
+            StatMods = 1 << 1,
+            MetaBehaviours = 1 << 2,
+        }
 
         public void Apply(GameObject target)
         {
@@ -50,27 +57,41 @@ namespace HHG.StatSystem.Runtime
 
         public ConditionAsset Aggregate(ConditionAsset other)
         {
-            Dictionary<Type, MetaBehaviour> dict = new Dictionary<Type, MetaBehaviour>();
-            mods.AddRange(other.mods);
-            // IEnumerables reference source collections, so convert to a list
-            // to make sure that when we clear behaviours, it doesn't affect combined
-            List<MetaBehaviour> combined = behaviours.Concat(other.behaviours).ToList();
-            behaviours.Clear(); // Clear after get combined
-            
-            foreach (MetaBehaviour behaviour in combined)
+            if (aggregateFlags.HasFlag(AggregateFlags.Duration))
             {
-                if (behaviour is IAggregatable)
-                {
-                    Type type = behaviour.GetType();
-                    dict[type] = dict.ContainsKey(type) ? (MetaBehaviour)((IAggregatable)dict[type]).Aggregate(behaviour) : behaviour;
-                }
-                else
-                {
-                    behaviours.Add(behaviour);
-                }
+                duration += other.duration;
             }
 
-            behaviours.AddRange(dict.Values);
+            if (aggregateFlags.HasFlag(AggregateFlags.Duration))
+            {
+                mods.AddRange(other.mods);
+            }
+
+            if (aggregateFlags.HasFlag(AggregateFlags.Duration))
+            {
+                Dictionary<Type, MetaBehaviour> dict = new Dictionary<Type, MetaBehaviour>();
+
+                // IEnumerables reference source collections, so convert to a list
+                // to make sure that when we clear behaviours, it doesn't affect combined
+                List<MetaBehaviour> combined = behaviours.Concat(other.behaviours).ToList();
+                behaviours.Clear(); // Clear after get combined
+
+                foreach (MetaBehaviour behaviour in combined)
+                {
+                    if (behaviour is IAggregatable)
+                    {
+                        Type type = behaviour.GetType();
+                        dict[type] = dict.ContainsKey(type) ? (MetaBehaviour)((IAggregatable)dict[type]).Aggregate(behaviour) : behaviour;
+                    }
+                    else
+                    {
+                        behaviours.Add(behaviour);
+                    }
+                }
+
+                behaviours.AddRange(dict.Values);
+            }
+
             return this;
         }
 
