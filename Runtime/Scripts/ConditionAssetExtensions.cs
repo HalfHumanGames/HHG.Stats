@@ -7,19 +7,19 @@ namespace HHG.StatSystem.Runtime
 {
     public static class ConditionAssetExtensions
     {
-        public static void Apply(this IEnumerable<ConditionAsset> conditions, GameObject target)
+        public static void Apply(this IEnumerable<ConditionAsset> conditions, object owner, GameObject target)
         {
             foreach (ConditionAsset condition in conditions)
             {
-                condition.Apply(target);
+                condition.Apply(owner, target);
             }
         }
 
-        public static void Remove(this IEnumerable<ConditionAsset> conditions, GameObject target)
+        public static void Remove(this IEnumerable<ConditionAsset> conditions, object owner, GameObject target)
         {
             foreach (ConditionAsset condition in conditions)
             {
-                condition.Remove(target);
+                condition.Remove(owner, target);
             }
         }
 

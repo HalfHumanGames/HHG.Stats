@@ -10,6 +10,7 @@ namespace HHG.StatSystem.Runtime
         private const float infinite = -1;
 
         private IStats stats;
+        private List<object> owners = new List<object>();
         private List<ConditionAsset> current = new List<ConditionAsset>();
         private List<MetaBehaviour[]> behaviours = new List<MetaBehaviour[]>();
         private List<float> timers = new List<float>();
@@ -19,7 +20,7 @@ namespace HHG.StatSystem.Runtime
             stats = GetComponentInChildren<IStats>();
         }
 
-        public void Apply(params ConditionAsset[] conditions)
+        public void Apply(object owner, params ConditionAsset[] conditions)
         {
             for (int i = 0; i < conditions.Length; i++)
             {
@@ -28,6 +29,13 @@ namespace HHG.StatSystem.Runtime
                     continue;
                 }
 
+                // Disable game object while setting up to make sure
+                // no issues occur since MetaBehaviours may reference
+                // Conditiontracker in Awake to get owner and whatnot
+                bool wasActive = gameObject.activeSelf;
+                gameObject.SetActive(false);
+
+                owners.Add(owner);
                 current.Add(conditions[i]);
                 behaviours.Add(gameObject.AddMetaBehaviours(conditions[i].Behaviours));
                 timers.Add(conditions[i].Duration);
@@ -36,6 +44,9 @@ namespace HHG.StatSystem.Runtime
                 {
                     conditions[i].Apply(stats);
                 }
+
+                // Enable game object if it was previously active
+                gameObject.SetActive(wasActive);
             }
         }
 
@@ -59,9 +70,18 @@ namespace HHG.StatSystem.Runtime
         }
 
 
-        public void Remove(ConditionAsset condition)
+        public void Remove(object owner, ConditionAsset condition)
         {
-            int index = current.IndexOf(condition);
+            int index = -1;
+
+            for (int i = 0; i < current.Count; i++)
+            {
+                if (owners[i] == owner && current[i] == condition)
+                {
+                    index = i;
+                    break;
+                }
+            }
 
             if (index >= 0)
             {
@@ -76,11 +96,80 @@ namespace HHG.StatSystem.Runtime
             behaviours[index].Destroy();
             behaviours.RemoveAt(index);
             timers.RemoveAt(index);
+            owners.RemoveAt(index);
 
             if (stats != null)
             {
                 condition.Remove(stats);
             }
+        }
+
+        public GameObject GetOwner(MetaBehaviour metaBehaviour)
+        {
+            return GetOwner<GameObject>(metaBehaviour);
+        }
+
+        public T GetOwner<T>(MetaBehaviour metaBehaviour)
+        {
+            T owner;
+            TryGetOwner(metaBehaviour, out owner);
+            return owner;
+        }
+
+        public bool TryGetOwner(MetaBehaviour metaBehaviour, out GameObject owner)
+        {
+            return TryGetOwner<GameObject>(metaBehaviour, out owner);
+        }
+
+        public bool TryGetOwner<T>(MetaBehaviour metaBehaviour, out T owner)
+        {
+            for (int i = 0; i < behaviours.Count; i++)
+            {
+                if (behaviours[i].Contains(metaBehaviour) && owners[i] is T val)
+                {
+                    owner = val;
+                    return true;
+                }
+            }
+
+            owner = default;
+            return false;
+        }
+
+        public ConditionAsset GetCondition(MetaBehaviour metaBehaviour)
+        {
+            ConditionAsset condition;
+            TryGetCondition(metaBehaviour, out condition);
+            return condition;
+        }
+
+        public bool TryGetCondition(MetaBehaviour metaBehaviour, out ConditionAsset condition)
+        {
+            for (int i = 0; i < behaviours.Count; i++)
+            {
+                if (behaviours[i].Contains(metaBehaviour))
+                {
+                    condition = current[i];
+                    return true;
+                }
+            }
+
+            condition = default;
+            return false;
+        }
+
+        public bool RemoveConditionOf(MetaBehaviour metaBehaviour)
+        {
+            for (int i = 0; i < behaviours.Count; i++)
+            {
+                if (behaviours[i].Contains(metaBehaviour))
+                {
+                    RemoveAt(i);
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

@@ -39,19 +39,19 @@ namespace HHG.StatSystem.Runtime
             MetaBehaviours = 1 << 2,
         }
 
-        public void Apply(GameObject target)
+        public void Apply(object owner, GameObject target)
         {
             if (target.TryGetComponent(out ConditionTracker tracker))
             {
-                tracker.Apply(this);
+                tracker.Apply(owner, this);
             }
         }
 
-        public void Remove(GameObject target)
+        public void Remove(object owner, GameObject target)
         {
             if (target.TryGetComponent(out ConditionTracker tracker))
             {
-                tracker.Remove(this);
+                tracker.Remove(owner, this);
             }
         }
 
@@ -97,8 +97,11 @@ namespace HHG.StatSystem.Runtime
 
         private void OnValidate()
         {
-            tag = null;
-            _ = Tag;
+            string tempTag = TagUtil.GetTag(name);
+            if (tag != tempTag)
+            {
+                tag = tempTag;
+            }
         }
 
         internal void Apply(IStats stats) => mods.Apply(stats);
