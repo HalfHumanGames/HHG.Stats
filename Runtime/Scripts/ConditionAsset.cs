@@ -62,12 +62,12 @@ namespace HHG.StatSystem.Runtime
                 duration += other.duration;
             }
 
-            if (aggregateFlags.HasFlag(AggregateFlags.Duration))
+            if (aggregateFlags.HasFlag(AggregateFlags.StatMods))
             {
                 mods.AddRange(other.mods);
             }
 
-            if (aggregateFlags.HasFlag(AggregateFlags.Duration))
+            if (aggregateFlags.HasFlag(AggregateFlags.MetaBehaviours))
             {
                 Dictionary<Type, MetaBehaviour> dict = new Dictionary<Type, MetaBehaviour>();
 
