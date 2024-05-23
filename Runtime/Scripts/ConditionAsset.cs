@@ -55,6 +55,26 @@ namespace HHG.StatSystem.Runtime
             }
         }
 
+        private bool seeded;
+
+        public object Seed()
+        {
+            if (!seeded)
+            {
+                seeded = true;
+
+                foreach (MetaBehaviour behaviour in behaviours)
+                {
+                    if (behaviour is IAggregatable aggregatable)
+                    {
+                        aggregatable.Seed();
+                    }
+                }
+            }
+
+            return this;
+        }
+
         public ConditionAsset Aggregate(ConditionAsset other)
         {
             if (aggregateFlags.HasFlag(AggregateFlags.Duration))
@@ -78,10 +98,10 @@ namespace HHG.StatSystem.Runtime
 
                 foreach (MetaBehaviour behaviour in combined)
                 {
-                    if (behaviour is IAggregatable)
+                    if (behaviour is IAggregatable aggregatable)
                     {
                         Type type = behaviour.GetType();
-                        dict[type] = dict.ContainsKey(type) ? (MetaBehaviour)((IAggregatable)dict[type]).Aggregate(behaviour) : behaviour;
+                        dict[type] = (MetaBehaviour)(dict.ContainsKey(type) ? ((IAggregatable)dict[type]).Aggregate(aggregatable) : aggregatable.Seed());
                     }
                     else
                     {

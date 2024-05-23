@@ -24,9 +24,13 @@ namespace HHG.StatSystem.Runtime
         {
             for (int i = 0; i < conditions.Length; i++)
             {
-                if (current.Any(c => c.Tag == conditions[i].Tag))
+                // Removing current conditions with the same tag
+                for (int j = 0; j < current.Count; j++)
                 {
-                    continue;
+                    if (current[i].Tag == conditions[i].Tag)
+                    {
+                        RemoveAt(i);
+                    }
                 }
 
                 // Disable game object while setting up to make sure

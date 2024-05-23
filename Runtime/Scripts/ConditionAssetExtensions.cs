@@ -36,7 +36,7 @@ namespace HHG.StatSystem.Runtime
                 foreach (ConditionAsset condition in source)
                 {
                     string tag = condition.Tag;
-                    dict[tag] = dict.ContainsKey(tag) ? dict[tag].Aggregate(condition) : Object.Instantiate(condition);
+                    dict[tag] = dict.ContainsKey(tag) ? dict[tag].Aggregate(condition) : (ConditionAsset) Object.Instantiate(condition).Seed();
                 }
 
                 aggregated.AddRange(dict.Values);
