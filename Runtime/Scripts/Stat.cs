@@ -13,7 +13,8 @@ namespace HHG.StatSystem.Runtime
         private bool isCalculated;
 
         private float value;
-        private List<StatMod> mods = new List<StatMod>();
+        // Serialize mods so get copied over with Object.Instantiate
+        [SerializeField, HideInInspector] private List<StatMod> mods = new List<StatMod>();
 
         public float Value
         {
