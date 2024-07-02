@@ -20,6 +20,11 @@ namespace HHG.StatSystem.Runtime
             stats = GetComponentInChildren<IStats>();
         }
 
+        public bool HasCondition(string tag)
+        {
+            return current.Any(c => c.Tag == tag);
+        }
+
         public void Apply(object owner, params ConditionAsset[] conditions)
         {
             for (int i = 0; i < conditions.Length; i++)

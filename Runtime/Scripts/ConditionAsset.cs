@@ -22,11 +22,13 @@ namespace HHG.StatSystem.Runtime
         }
         public float Priority => priority;
         public float Duration => duration;
+        public Color Color => color;
         public IReadOnlyList<MetaBehaviour> Behaviours => behaviours;
 
         [SerializeField] private string tag;
         [SerializeField] private float priority;
         [SerializeField] private float duration;
+        [SerializeField] private Color color;
         [SerializeField] private List<StatsMod> mods = new List<StatsMod>();
         [SerializeReference, SerializeReferenceDropdown] private List<MetaBehaviour> behaviours = new List<MetaBehaviour>();
         [SerializeField] private AggregateFlags aggregateFlags;
