@@ -20,6 +20,34 @@ namespace HHG.StatSystem.Runtime
             stats = GetComponentInChildren<IStats>();
         }
 
+        private void OnDisable()
+        {
+            while (timers.Count > 0)
+            {
+                int last = timers.Count - 1;
+                RemoveAt(last);
+            }
+        }
+
+        private void Update()
+        {
+            for (int i = 0; i < timers.Count; i++)
+            {
+                if (timers[i] == infinite)
+                {
+                    continue;
+                }
+
+                timers[i] -= Time.deltaTime;
+
+                if (timers[i] <= 0)
+                {
+                    RemoveAt(i);
+                    i--;
+                }
+            }
+        }
+
         public bool HasCondition(string tag)
         {
             return current.Any(c => c.Tag == tag);
@@ -58,26 +86,6 @@ namespace HHG.StatSystem.Runtime
                 gameObject.SetActive(wasActive);
             }
         }
-
-        private void Update()
-        {
-            for (int i = 0; i < timers.Count; i++)
-            {
-                if (timers[i] == infinite)
-                {
-                    continue;
-                }
-
-                timers[i] -= Time.deltaTime;
-
-                if (timers[i] <= 0)
-                {
-                    RemoveAt(i);
-                    i--;
-                }
-            }
-        }
-
 
         public void Remove(object owner, ConditionAsset condition)
         {
