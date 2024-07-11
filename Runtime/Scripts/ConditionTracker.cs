@@ -22,11 +22,8 @@ namespace HHG.StatSystem.Runtime
 
         private void OnDisable()
         {
-            while (timers.Count > 0)
-            {
-                int last = timers.Count - 1;
-                RemoveAt(last);
-            }
+            // Don't clear conditions on disable since scripts may toggle
+            // the game object active and it'll lose it's conditions
         }
 
         private void Update()
@@ -187,6 +184,15 @@ namespace HHG.StatSystem.Runtime
             }
 
             return false;
+        }
+
+        public void RemoveAllConditions()
+        {
+            while (timers.Count > 0)
+            {
+                int last = timers.Count - 1;
+                RemoveAt(last);
+            }
         }
     }
 }
