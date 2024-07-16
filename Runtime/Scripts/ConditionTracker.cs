@@ -9,6 +9,8 @@ namespace HHG.StatSystem.Runtime
     {
         private const float infinite = -1;
 
+        public IReadOnlyList<ConditionAsset> Conditions => current;
+
         private IStats stats;
         private List<object> owners = new List<object>();
         private List<ConditionAsset> current = new List<ConditionAsset>();
