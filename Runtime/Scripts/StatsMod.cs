@@ -7,13 +7,13 @@ namespace HHG.StatSystem.Runtime
     [Serializable]
     public class StatsMod : StatMod
     {
-        [SerializeField, Dropdown] private StatAsset stat;
+        [SerializeField, Dropdown] private string stat;
 
-        public StatsMod(StatAsset name, float value) : base(value) => stat = name;
-        public StatsMod(StatAsset name, float value, StatModType type) : base(value, type) => stat = name;
-        public StatsMod(StatAsset name, float value, StatModType type, object source) : base(value, type, source) => stat = name;
-        public StatsMod(StatAsset name, float value, StatModType type, int order) : base(value, type, order) => stat = name;
-        public StatsMod(StatAsset name, float value, StatModType type, object source, int order) : base(value, type, source, order) => stat = name;
+        public StatsMod(string name, float value) : base(value) => stat = name;
+        public StatsMod(string name, float value, StatModType type) : base(value, type) => stat = name;
+        public StatsMod(string name, float value, StatModType type, object source) : base(value, type, source) => stat = name;
+        public StatsMod(string name, float value, StatModType type, int order) : base(value, type, order) => stat = name;
+        public StatsMod(string name, float value, StatModType type, object source, int order) : base(value, type, source, order) => stat = name;
 
         private enum Action
         {
@@ -39,10 +39,10 @@ namespace HHG.StatSystem.Runtime
             }
             else
             {
-                Stat s = stats[stat.name];
+                Stat s = stats[stat];
                 if (s == null)
                 {
-                    Debug.LogError($"Stat not found: {stat.name}");
+                    Debug.LogError($"Stat not found: {stat}");
                 }
                 else
                 {
@@ -59,6 +59,4 @@ namespace HHG.StatSystem.Runtime
             }
         }
     }
-
-
 }

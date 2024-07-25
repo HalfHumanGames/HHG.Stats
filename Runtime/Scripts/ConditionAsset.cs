@@ -33,6 +33,8 @@ namespace HHG.StatSystem.Runtime
         [SerializeReference, SerializeReferenceDropdown] private List<MetaBehaviour> behaviours = new List<MetaBehaviour>();
         [SerializeField] private AggregateFlags aggregateFlags;
 
+        private bool seeded;
+
         [Flags]
         private enum AggregateFlags
         {
@@ -56,8 +58,6 @@ namespace HHG.StatSystem.Runtime
                 tracker.Remove(owner, this);
             }
         }
-
-        private bool seeded;
 
         public object Seed()
         {
