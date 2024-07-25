@@ -7,13 +7,17 @@ namespace HHG.StatSystem.Runtime
     [Serializable]
     public class StatsMod : StatMod
     {
-        [SerializeField, Dropdown] private string stat;
+        public string Stat => stat == null ? _stat : stat;
 
-        public StatsMod(string name, float value) : base(value) => stat = name;
-        public StatsMod(string name, float value, StatModType type) : base(value, type) => stat = name;
-        public StatsMod(string name, float value, StatModType type, object source) : base(value, type, source) => stat = name;
-        public StatsMod(string name, float value, StatModType type, int order) : base(value, type, order) => stat = name;
-        public StatsMod(string name, float value, StatModType type, object source, int order) : base(value, type, source, order) => stat = name;
+        [SerializeField, Dropdown] private StatAsset stat;
+
+        private string _stat;
+
+        public StatsMod(string name, float value) : base(value) => _stat = name;
+        public StatsMod(string name, float value, StatModType type) : base(value, type) => _stat = name;
+        public StatsMod(string name, float value, StatModType type, object source) : base(value, type, source) => _stat = name;
+        public StatsMod(string name, float value, StatModType type, int order) : base(value, type, order) => _stat = name;
+        public StatsMod(string name, float value, StatModType type, object source, int order) : base(value, type, source, order) => _stat = name;
 
         private enum Action
         {
@@ -33,16 +37,16 @@ namespace HHG.StatSystem.Runtime
 
         private void Modify(IStats stats, Action action)
         {
-            if (stat == null)
+            if (Stat == null)
             {
                 Debug.LogError($"Stat cannot be null.");
             }
             else
             {
-                Stat s = stats[stat];
+                Stat s = stats[Stat];
                 if (s == null)
                 {
-                    Debug.LogError($"Stat not found: {stat}");
+                    Debug.LogError($"Stat not found: {Stat}");
                 }
                 else
                 {

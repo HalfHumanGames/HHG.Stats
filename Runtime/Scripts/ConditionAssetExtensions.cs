@@ -33,7 +33,7 @@ namespace HHG.StatSystem.Runtime
             {
                 Dictionary<string, ConditionAsset> dict = new Dictionary<string, ConditionAsset>();
 
-                foreach (ConditionAsset condition in source)
+                foreach (ConditionAsset condition in source.OrderBy(s => s.Priority))
                 {
                     string tag = condition.Tag;
                     dict[tag] = dict.ContainsKey(tag) ? dict[tag].Aggregate(condition) : (ConditionAsset) Object.Instantiate(condition).Seed();
