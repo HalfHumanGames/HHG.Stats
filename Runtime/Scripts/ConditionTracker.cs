@@ -17,6 +17,9 @@ namespace HHG.StatSystem.Runtime
         private List<MetaBehaviour[]> behaviours = new List<MetaBehaviour[]>();
         private List<float> timers = new List<float>();
 
+        public event System.Action<ConditionTracker, ConditionAsset> ConditionAdded;
+        public event System.Action<ConditionTracker, ConditionAsset> ConditionRemoved;
+
         private void Awake()
         {
             stats = GetComponentInChildren<IStats>();
@@ -83,6 +86,8 @@ namespace HHG.StatSystem.Runtime
 
                 // Enable game object if it was previously active
                 gameObject.SetActive(wasActive);
+
+                ConditionAdded?.Invoke(this, conditions[i]);
             }
         }
 
@@ -118,6 +123,8 @@ namespace HHG.StatSystem.Runtime
             {
                 condition.Remove(stats);
             }
+
+            ConditionRemoved?.Invoke(this, condition);
         }
 
         public GameObject GetOwner(MetaBehaviour metaBehaviour)
