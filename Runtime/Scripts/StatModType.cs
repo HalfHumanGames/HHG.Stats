@@ -2,7 +2,7 @@ namespace HHG.StatSystem.Runtime
 {
     public enum StatModType
     {
-        Flat,
+        FlatAdd,
         PercAdd,
         PercMult,
     }

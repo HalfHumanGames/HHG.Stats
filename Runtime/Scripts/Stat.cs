@@ -84,7 +84,7 @@ namespace HHG.StatSystem.Runtime
 
                 switch (mod.Type)
                 {
-                    case StatModType.Flat:
+                    case StatModType.FlatAdd:
                         value += mod.Value;
                         break;
                     case StatModType.PercAdd:

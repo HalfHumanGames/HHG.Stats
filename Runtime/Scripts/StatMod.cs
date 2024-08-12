@@ -1,35 +1,38 @@
+using HHG.Common.Runtime;
 using System;
 using UnityEngine;
 
 namespace HHG.StatSystem.Runtime
 {
     [Serializable]
-    public class StatMod : IComparable<StatMod>
+    public class StatMod : IComparable<StatMod>, ICloneable<StatMod>
     {
+        private const int defaultSortOrder = -1;
+
         public float Value => value;
         public StatModType Type => type;
         public object Source => source;
-        public int Order => order;
+        public int SortOrder => sortOrder;
 
         [SerializeField] private float value;
         [SerializeField] private StatModType type;
-        [SerializeField] private int order;
+        [SerializeField, HideInInspector] private int sortOrder;
 
         private object source;
 
-        public StatMod(float value, StatModType type, object source, int order)
+        public StatMod(float modValue = 0, StatModType modType = StatModType.FlatAdd, object modSource = null, int modSortOrder = defaultSortOrder)
         {
-            this.value = value;
-            this.type = type;
-            this.source = source;
-            this.order = order;
+            value = modValue;
+            type = modType;
+            source = modSource;
+            sortOrder = modSortOrder == defaultSortOrder ? (int)modType : modSortOrder;
         }
 
-        public StatMod(float value) : this(value, StatModType.Flat, null, (int)StatModType.Flat) { }
-        public StatMod(float value, StatModType type) : this(value, type, null, (int)type) { }
-        public StatMod(float value, StatModType type, object source) : this(value, type, source, (int)type) { }
-        public StatMod(float value, StatModType type, int order) : this(value, type, null, order) { }
+        public int CompareTo(StatMod other) => SortOrder.CompareTo(other.SortOrder);
 
-        public int CompareTo(StatMod other) => Order.CompareTo(other.Order);
+        public StatMod Clone()
+        {
+            return (StatMod) MemberwiseClone();
+        }
     }
 }
