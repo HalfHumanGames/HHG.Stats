@@ -1,21 +1,14 @@
 using HHG.Common.Runtime;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace HHG.StatSystem.Runtime
 {
     [Serializable]
-    public class Stat : ICloneable<Stat>
+    public class Stat : ICloneable<Stat>, ISerializationCallbackReceiver
     {
-        [SerializeField] private float baseValue;
-
-        private bool isCalculated;
-
-        private float value;
-        // Serialize mods so get copied over with Object.Instantiate
-        [SerializeField, HideInInspector] private List<StatMod> mods = new List<StatMod>();
-
         public float Value
         {
             get
@@ -29,34 +22,92 @@ namespace HHG.StatSystem.Runtime
             }
         }
 
+        public float BaseValue
+        {
+            get => baseValue;
+            set
+            {
+                baseValue = value;
+                CalculateValue();
+            }
+        }
+
+        public Rounding Rounding
+        {
+            get => rounding;
+            set
+            {
+                rounding = value;
+                CalculateValue();
+            }
+        }
+
         public event Action<float> Updated;
 
-        public Stat()
+        [SerializeField] private float baseValue;
+
+        private bool isCalculated;
+
+        private float value;
+
+        // Serialize so gets copied over with Object.Instantiate
+        [SerializeField, HideInInspector] private Rounding rounding;
+        [SerializeField, HideInInspector] private List<StatMod> mods = new List<StatMod>();
+
+
+        public Stat(Rounding round = Rounding.None)
         {
+            rounding = round;
             mods = new List<StatMod>();
         }
 
-        public Stat(float val) : this()
+        public Stat(float val, Rounding round = Rounding.None) : this(round)
         {
             baseValue = val;
         }
 
-        public void AddMod(StatMod mod)
+        public void Flatten()
         {
-            mods.Add(mod);
+            baseValue = value;
+            mods.Clear();
+            CalculateValue();
+        }
+
+        public void AddMod(StatMod add)
+        {
+            mods.Add(add);
             mods.Sort();
             CalculateValue();
         }
 
-        public bool RemoveMod(StatMod mod)
+        public void AddMods(IEnumerable<StatMod> add)
         {
-            if (mods.Remove(mod))
+            mods.AddRange(add);
+            mods.Sort();
+            CalculateValue();
+        }
+
+        public bool RemoveMod(StatMod remove)
+        {
+            if (mods.Remove(remove))
             {
                 CalculateValue();
                 return true;
             }
 
             return false;
+        }
+
+        public void RemoveMods(IEnumerable<StatMod> remove)
+        {
+            mods.RemoveRange(remove);
+            CalculateValue();
+        }
+
+        public void ClearMods()
+        {
+            mods.Clear();
+            CalculateValue();
         }
 
         public bool RemoveModsFromSource(object source)
@@ -101,14 +152,44 @@ namespace HHG.StatSystem.Runtime
                 }
             }
 
+            switch (rounding)
+            {
+                case Rounding.Round:
+                    value = Mathf.Round(value);
+                    break;
+                case Rounding.Ceil:
+                    value = Mathf.Ceil(value);
+                    break;
+                case Rounding.Floor:
+                    value = Mathf.Floor(value);
+                    break;
+            }
+
             Updated?.Invoke(value);
         }
 
         public Stat Clone()
         {
             Stat clone = (Stat)MemberwiseClone();
-            clone.mods = new List<StatMod>(mods);
+            clone.mods = new List<StatMod>(mods.Select(m => m.Clone()));
             return clone;
+        }
+
+        public void OnBeforeSerialize()
+        {
+            // Do nothing
+        }
+
+        // In case part of an object cloned with JsonUtility
+        public void OnAfterDeserialize()
+        {
+            mods ??= new List<StatMod>();
+            CalculateValue();
+        }
+
+        public override string ToString()
+        {
+            return Value.ToString();
         }
 
         public static implicit operator float(Stat stat)
