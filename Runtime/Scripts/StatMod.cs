@@ -2,7 +2,7 @@ using HHG.Common.Runtime;
 using System;
 using UnityEngine;
 
-namespace HHG.StatSystem.Runtime
+namespace HHG.Stats.Runtime
 {
     [Serializable]
     public class StatMod : IComparable<StatMod>, ICloneable<StatMod>

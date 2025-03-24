@@ -1,13 +1,13 @@
 {
-  "name": "com.halfhumangames.statsystem",
+  "name": "com.halfhumangames.stats",
   "version": "1.0.0",
-  "displayName": "HHG - Stat System",
+  "displayName": "HHG - Stats",
   "description": "Stat system for Unity",
   "unity": "2020.3",
   "unityRelease": "6f1",
-  "documentationUrl": "https://github.com/HalfHumanGames/HHG.StatSystem/blob/main/README.md",
-  "changelogUrl": "https://github.com/HalfHumanGames/HHG.StatSystem/blob/main/CHANGELOG.md",
-  "licensesUrl": "https://github.com/HalfHumanGames/HHG.StatSystem/blob/main/LICENSE",
+  "documentationUrl": "https://github.com/HalfHumanGames/HHG.Stats/blob/main/README.md",
+  "changelogUrl": "https://github.com/HalfHumanGames/HHG.Stats/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/HalfHumanGames/HHG.Stats/blob/main/LICENSE",
   "keywords": [
     "Stat",
     "Element"

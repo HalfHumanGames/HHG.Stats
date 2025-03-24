@@ -1,4 +1,4 @@
-namespace HHG.StatSystem.Runtime
+namespace HHG.Stats.Runtime
 {
     public enum StatModType
     {

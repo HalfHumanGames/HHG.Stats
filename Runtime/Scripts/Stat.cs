@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace HHG.StatSystem.Runtime
+namespace HHG.Stats.Runtime
 {
     [Serializable]
     public class Stat : ICloneable<Stat>, ISerializationCallbackReceiver
