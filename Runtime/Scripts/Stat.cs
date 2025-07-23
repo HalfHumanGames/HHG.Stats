@@ -27,7 +27,7 @@ namespace HHG.Stats.Runtime
             get => baseValue;
             set
             {
-                baseValue = value;
+                baseValue = rounding.Round(value);
                 CalculateValue();
             }
         }
@@ -152,18 +152,7 @@ namespace HHG.Stats.Runtime
                 }
             }
 
-            switch (rounding)
-            {
-                case Rounding.Round:
-                    value = Mathf.Round(value);
-                    break;
-                case Rounding.Ceil:
-                    value = Mathf.Ceil(value);
-                    break;
-                case Rounding.Floor:
-                    value = Mathf.Floor(value);
-                    break;
-            }
+            value = rounding.Round(value);
 
             Updated?.Invoke(value);
         }
@@ -190,6 +179,11 @@ namespace HHG.Stats.Runtime
         public override string ToString()
         {
             return Value.ToString();
+        }
+
+        public string ToString(string format)
+        {
+            return Value.ToString(format);
         }
 
         public static implicit operator float(Stat stat)
