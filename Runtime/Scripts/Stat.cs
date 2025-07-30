@@ -190,5 +190,10 @@ namespace HHG.Stats.Runtime
         {
             return stat.Value;
         }
+
+        public static implicit operator int(Stat stat)
+        {
+            return (int)stat.Value;
+        }
     }
 }
