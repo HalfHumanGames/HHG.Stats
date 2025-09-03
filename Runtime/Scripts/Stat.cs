@@ -1,4 +1,4 @@
-using HHG.Common.Runtime;
+﻿using HHG.Common.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,7 @@ namespace HHG.Stats.Runtime
                 if (!isCalculated)
                 {
                     isCalculated = true;
-                    CalculateValue();
+                    UpdateValue();
                 }
                 return value;
             }
@@ -28,7 +28,7 @@ namespace HHG.Stats.Runtime
             set
             {
                 baseValue = rounding.Round(value);
-                CalculateValue();
+                UpdateValue();
             }
         }
 
@@ -38,7 +38,7 @@ namespace HHG.Stats.Runtime
             set
             {
                 rounding = value;
-                CalculateValue();
+                UpdateValue();
             }
         }
 
@@ -70,28 +70,28 @@ namespace HHG.Stats.Runtime
         {
             baseValue = value;
             mods.Clear();
-            CalculateValue();
+            UpdateValue();
         }
 
         public void AddMod(StatMod add)
         {
             mods.Add(add);
             mods.Sort();
-            CalculateValue();
+            UpdateValue();
         }
 
         public void AddMods(IEnumerable<StatMod> add)
         {
             mods.AddRange(add);
             mods.Sort();
-            CalculateValue();
+            UpdateValue();
         }
 
         public bool RemoveMod(StatMod remove)
         {
             if (mods.Remove(remove))
             {
-                CalculateValue();
+                UpdateValue();
                 return true;
             }
 
@@ -101,13 +101,13 @@ namespace HHG.Stats.Runtime
         public void RemoveMods(IEnumerable<StatMod> remove)
         {
             mods.RemoveRange(remove);
-            CalculateValue();
+            UpdateValue();
         }
 
         public void ClearMods()
         {
             mods.Clear();
-            CalculateValue();
+            UpdateValue();
         }
 
         public bool RemoveModsFromSource(object source)
@@ -116,22 +116,25 @@ namespace HHG.Stats.Runtime
 
             if (removed > 0)
             {
-                CalculateValue();
+                UpdateValue();
                 return true;
             }
 
             return false;
         }
 
-        private void CalculateValue()
+        // Public so can calculate value from a subset of stat mods
+        // For example, to get value from just buffs/debuffs: 62 (↑20)
+        public float CalculateValue(Func<StatMod, bool> filter = null)
         {
-            value = baseValue;
-
+            float value = baseValue;
             float percAdd = 0;
 
             for (int i = 0; i < mods.Count; i++)
             {
                 StatMod mod = mods[i];
+
+                if (filter?.Invoke(mod) == false) continue;
 
                 switch (mod.Type)
                 {
@@ -152,8 +155,12 @@ namespace HHG.Stats.Runtime
                 }
             }
 
-            value = rounding.Round(value);
+            return rounding.Round(value);
+        }
 
+        private void UpdateValue()
+        {
+            value = CalculateValue();
             Updated?.Invoke(value);
         }
 
@@ -173,7 +180,7 @@ namespace HHG.Stats.Runtime
         public void OnAfterDeserialize()
         {
             mods ??= new List<StatMod>();
-            CalculateValue();
+            UpdateValue();
         }
 
         public override string ToString()
