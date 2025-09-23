@@ -113,6 +113,13 @@ namespace HHG.Stats.Runtime
             UpdateValue();
         }
 
+        public void Clear()
+        {
+            mods.Clear();
+            baseValue = 0f;
+            UpdateValue();
+        }
+
         public bool RemoveModsFromSource(object source)
         {
             int removed = mods.RemoveAll(mod => mod.Source == source);
