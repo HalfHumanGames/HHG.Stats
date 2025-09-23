@@ -42,6 +42,9 @@ namespace HHG.Stats.Runtime
             }
         }
 
+        public IReadOnlyList<StatMod> Mods => mods;
+        public IReadOnlyDictionary<StatMod, float> Contributions => contributions;
+
         public event Action<float> Updated;
 
         [SerializeField] private float baseValue;
@@ -53,7 +56,7 @@ namespace HHG.Stats.Runtime
         // Serialize so gets copied over with Object.Instantiate
         [SerializeField, HideInInspector] private Rounding rounding;
         [SerializeField, HideInInspector] private List<StatMod> mods = new List<StatMod>();
-
+        [SerializeField, HideInInspector] private SerializedDictionary<StatMod, float> contributions = new SerializedDictionary<StatMod, float>();
 
         public Stat(Rounding round = Rounding.None)
         {
@@ -127,8 +130,11 @@ namespace HHG.Stats.Runtime
         // For example, to get value from just buffs/debuffs: 62 (↑20)
         public float CalculateValue(Func<StatMod, bool> filter = null)
         {
+            float before;
             float value = baseValue;
             float percAdd = 0;
+
+            contributions.Clear();
 
             for (int i = 0; i < mods.Count; i++)
             {
@@ -140,17 +146,22 @@ namespace HHG.Stats.Runtime
                 {
                     case StatModType.FlatAdd:
                         value += mod.Value;
+                        contributions[mod] = mod.Value;
                         break;
                     case StatModType.PercAdd:
                         percAdd += mod.Value;
                         if (i == mods.Count - 1 || mods[i + 1].Type != StatModType.PercAdd)
                         {
+                            before = value;
                             value *= 1 + percAdd;
                             percAdd = 0;
+                            contributions[mod] = value - before;
                         }
                         break;
                     case StatModType.PercMult:
+                        before = value;
                         value *= 1 + mod.Value;
+                        contributions[mod] = value - before;
                         break;
                 }
             }
