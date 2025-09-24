@@ -122,7 +122,9 @@ namespace HHG.Stats.Runtime
 
         public bool RemoveModsFromSource(object source)
         {
-            int removed = mods.RemoveAll(mod => mod.Source == source);
+            // Use Equals instead of == since the latter compares boxed structs as references
+            // instead of as valuess, causing it to return false even if it had the same value
+            int removed = mods.RemoveAll(mod => mod.Source.Equals(source));
 
             if (removed > 0)
             {
