@@ -145,43 +145,68 @@ namespace HHG.Stats.Runtime
 
             contributions.Clear();
 
-            for (int i = 0; i < mods.Count; i++)
+            using(Pool.GetList(out List<StatMod> percAddMods))
             {
-                StatMod mod = mods[i];
-
-                if (filter?.Invoke(mod) == false) continue;
-
-                switch (mod.Type)
+                for (int i = 0, len = mods.Count; i < len; i++)
                 {
-                    case StatModType.FlatAdd:
-                        value += mod.Value;
-                        contributions[mod] = mod.Value;
-                        break;
-                    case StatModType.PercAdd:
-                        percAdd += mod.Value;
-                        if (i == mods.Count - 1 || mods[i + 1].Type != StatModType.PercAdd)
-                        {
+                    StatMod mod = mods[i];
+
+                    if (filter?.Invoke(mod) == false) continue;
+
+                    switch (mod.Type)
+                    {
+                        case StatModType.FlatAdd:
+                            value += mod.Value;
+                            contributions.Add(mod, mod.Value);
+                            break;
+
+                        case StatModType.PercAdd:
+                            percAdd += mod.Value;
+                            percAddMods.Add(mod);
+
+                            StatMod next = GetNextMod(i, len);
+                            if (next == null || next.Type != StatModType.PercAdd)
+                            {
+                                before = value;
+                                value *= 1 + percAdd;
+
+                                foreach (StatMod percAddMod in percAddMods)
+                                {
+                                    float contribution = rounding.Round(before * percAddMod.Value);
+                                    contributions.Add(percAddMod, contribution);
+                                }
+
+                                percAdd = 0;
+                                percAddMods.Clear();
+                            }
+
+                            break;
+
+                        case StatModType.PercMult:
                             before = value;
-                            value *= 1 + percAdd;
-                            percAdd = 0;
-                            contributions[mod] = value - before;
-                        }
-                        break;
-                    case StatModType.PercMult:
-                        before = value;
-                        value *= 1 + mod.Value;
-                        contributions[mod] = value - before;
-                        break;
+                            value *= 1 + mod.Value;
+                            contributions.Add(mod, value - before);
+                            break;
+                    }
                 }
             }
 
             return rounding.Round(value);
-        }
 
-        private void UpdateValue()
-        {
-            value = CalculateValue();
-            Updated?.Invoke(value);
+            StatMod GetNextMod(int i, int len)
+            {
+                for (int j = i + 1; j < len; j++)
+                {
+                    StatMod next = mods[j];
+
+                    if (filter?.Invoke(next) != false)
+                    {
+                        return next;
+                    }
+                }
+
+                return null;
+            }
         }
 
         public Stat Clone()
@@ -211,6 +236,12 @@ namespace HHG.Stats.Runtime
         public string ToString(string format)
         {
             return Value.ToString(format);
+        }
+
+        private void UpdateValue()
+        {
+            value = CalculateValue();
+            Updated?.Invoke(value);
         }
 
         public static implicit operator float(Stat stat)
