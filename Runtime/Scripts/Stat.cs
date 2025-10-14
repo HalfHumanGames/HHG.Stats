@@ -137,13 +137,15 @@ namespace HHG.Stats.Runtime
 
         // Public so can calculate value from a subset of stat mods
         // For example, to get value from just buffs/debuffs: 62 (↑20)
-        public float CalculateValue(Func<StatMod, bool> filter = null)
+        // Contributions is an optional param for external invocations
+        // We don't want to overwrite the actual contributions dictionary
+        public float CalculateValue(Func<StatMod, bool> filter = null, IDictionary<StatMod, float> contributions = null)
         {
             float before;
             float value = baseValue;
             float percAdd = 0;
 
-            contributions.Clear();
+            contributions?.Clear();
 
             using(Pool.GetList(out List<StatMod> percAddMods))
             {
@@ -157,7 +159,7 @@ namespace HHG.Stats.Runtime
                     {
                         case StatModType.FlatAdd:
                             value += mod.Value;
-                            contributions.Add(mod, mod.Value);
+                            contributions?.Add(mod, mod.Value);
                             break;
 
                         case StatModType.PercAdd:
@@ -173,7 +175,7 @@ namespace HHG.Stats.Runtime
                                 foreach (StatMod percAddMod in percAddMods)
                                 {
                                     float contribution = rounding.Round(before * percAddMod.Value);
-                                    contributions.Add(percAddMod, contribution);
+                                    contributions?.Add(percAddMod, contribution);
                                 }
 
                                 percAdd = 0;
@@ -185,7 +187,7 @@ namespace HHG.Stats.Runtime
                         case StatModType.PercMult:
                             before = value;
                             value *= 1 + mod.Value;
-                            contributions.Add(mod, value - before);
+                            contributions?.Add(mod, value - before);
                             break;
                     }
                 }
@@ -240,7 +242,7 @@ namespace HHG.Stats.Runtime
 
         private void UpdateValue()
         {
-            value = CalculateValue();
+            value = CalculateValue(null, contributions);
             Updated?.Invoke(value);
         }
 
